@@ -1,16 +1,34 @@
 pipeline {
-    agent any
-    stages {
-        stage('Build') {
-            steps {
-                sh 'echo build-1'
-                sh 'echo build-2'
-            }
-        }
-        stage('Test') {
-            steps {
-                sh 'echo test-1'
-            }
-        }
+  agent {
+    kubernetes {
+      yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    some-label: some-label-value
+spec:
+  containers:
+  - name: maven
+    image: maven:alpine
+    command:
+    - cat
+    tty: true
+  - name: busybox
+    image: busybox
+    command:
+    - cat
+    tty: true
+"""
     }
+  }
+  stages {
+    stage('Run maven') {
+      steps {
+        container('busybox') {
+          sh '/bin/busybox'
+        }
+      }
+    }
+  }
 }
