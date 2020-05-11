@@ -1,34 +1,17 @@
-pipeline {
-  agent {
-    kubernetes {
-      yaml """
-apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-    some-label: some-label-value
-spec:
-  containers:
-  - name: maven
-    image: maven:alpine
-    command:
-    - cat
-    tty: true
-  - name: busybox
-    image: busybox
-    command:
-    - cat
-    tty: true
-"""
+pipeline{
+    agent none
+    stages {
+            stage('Java Tasks') {
+                agent {
+                    label 'test'
+                }
+                stages {
+                    stage('Generate Code') {
+                        steps {
+                            sh 'echo 1'
+                        }
+                    }
+                }
+            }
     }
-  }
-  stages {
-    stage('Run maven') {
-      steps {
-        container('busybox') {
-          sh '/bin/busybox'
-        }
-      }
-    }
-  }
 }
